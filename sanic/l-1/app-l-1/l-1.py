@@ -3,11 +3,12 @@
 from sanic import Sanic
 from sanic import response
 import json
+import base64
 
 
 app = Sanic()
 app.static('/static', './static')
-app.static('/favicon.ico', './static/favicon.ico')
+app.static('/favicon.ico', './static/favicon.ico', name='favicon.ico')
 
 
 @app.route("/")
@@ -22,22 +23,36 @@ async def json_echo(request):
     return response.json(json.dumps(param_json))
 
 
+@app.post("/form")
+async def upload_file(request):
+    '''form demo
+    '''
+    for key in request.form:
+        param = request.form.get(key)
+        print(key, param)
+    return response.json({'received': True, 'form': request.form})
+
+
 @app.route("/show_upload")
 async def show_upload(request):
     return response.html('<html></html>')
 
 
-@app.route("/upload")
+@app.post("/upload")
 async def upload_file(request):
     '''for single file upload
     '''
-    param_file = request.files.get('upload_file')
-    file_params = {
-        'body': param_file.body,
-        'name': param_file.name,
-        'type': param_file.type
-    }
-    return json({'received': True, 'file_names': request.files.keys(), 'file_parameters': file_params})
+    file_params = list()
+    for key in request.files:
+        param_file = request.files.get(key)
+        print(key)
+        # b64str = base64.b64encode(param_file.body)
+        file_params.append({
+            # 'body': b64str,
+            'name': param_file.name,
+            'type': param_file.type
+        })
+    return response.json({'received': True, 'file_names': request.files.keys(), 'file_params': file_params})
 
 
 @app.route("/tag/<tag>")
@@ -46,4 +61,4 @@ async def tag_handler(request, tag):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080)
+    app.run(host="0.0.0.0", port=8080, workers=2)
