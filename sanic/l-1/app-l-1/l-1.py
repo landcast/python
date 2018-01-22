@@ -6,9 +6,10 @@ import json
 import base64
 
 
-app = Sanic()
+app = Sanic('l1-1')
 app.static('/static', './static')
 app.static('/favicon.ico', './static/favicon.ico', name='favicon.ico')
+app.config.upload_location = '/var/upload/l1-1'
 
 
 @app.route("/")
