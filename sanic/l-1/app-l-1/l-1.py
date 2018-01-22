@@ -17,9 +17,8 @@ async def test(request):
 
 @app.post("/json/echo")
 async def json_echo(request):
-    str_1 = request.body.decode()
-    print(str_1)
-    param_json = json.loads(str_1)
+    param_json = json.loads(request.body.decode())
+    param_json['id'] = param_json['id'] + 1
     return response.json(json.dumps(param_json))
 
 
