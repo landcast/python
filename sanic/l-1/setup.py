@@ -23,10 +23,10 @@ setup(
     version='0.0.1-dev',
 
     description='A sanic web demo python project',
-    #long_description=long_description,
+    # long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com/tomli1978/sanic-l-1',
+    url='https://github.com/landcast/python/sanic-l-1',
 
     # Author details
     author='Tom Li',
@@ -71,13 +71,13 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=['common-utils'],
+    install_requires=['sanic'],
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
     # for example:
     # $ pip install -e .[dev,test]
-    #extras_require={
+    # extras_require={
     #    'dev': ['check-manifest'],
     #    'test': ['coverage'],
     #},
@@ -85,7 +85,7 @@ setup(
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
-    #package_data={
+    # package_data={
     #   'sample': ['package_data.dat'],
     #},
 
@@ -98,7 +98,7 @@ setup(
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow
     # pip to create the appropriate form of executable for the target platform.
-    #entry_points={
+    # entry_points={
     #    'console_scripts': [
     #       'sample=sample:main',
     #    ],
