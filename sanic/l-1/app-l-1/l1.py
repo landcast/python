@@ -2,14 +2,41 @@
 
 from sanic import Sanic
 from sanic import response
+from config import appconfig
+import os
 import json
 import base64
 
 
 app = Sanic('l1-1')
-app.static('/static', './static')
-app.static('/favicon.ico', './static/favicon.ico', name='favicon.ico')
-app.config.upload_location = '/var/upload/l1-1'
+
+
+def init(app):
+    ''' sanic app init process, the load priority controled by loading sequence
+    '''
+    # try to load UPLOAD_LOCATION
+    try:
+        print("from env variable", app.config.UPLOAD_LOCATION)
+    except:
+        print("not found in env for SANIC_UPLOAD_LOCATION")
+
+    # test config load priority, env variable -> object -> config file
+    app.config.from_object(appconfig())
+
+    try:
+        print("check APP_CONFIG_FILE from os", os.environ['APP_CONFIG_FILE'])
+    except:
+        print("check APP_CONFIG_FILE, but not exist")
+    else:
+        app.config.from_envvar('APP_CONFIG_FILE')
+        print("from envvar load config file", app.config.UPLOAD_LOCATION)
+
+    app.config.UPLOAD_LOCATION = '/var/upload/l1-1'
+    print("set newlocation", app.config.UPLOAD_LOCATION)
+
+    print("load upload_location from object", app.config.UPLOAD_LOCATION)
+    app.static('/static', './static')
+    app.static('/favicon.ico', './static/favicon.ico', name='favicon.ico')
 
 
 @app.route("/")
@@ -62,4 +89,5 @@ async def tag_handler(request, tag):
 
 
 if __name__ == "__main__":
+    init(app)
     app.run(host="0.0.0.0", port=8080, workers=2)
