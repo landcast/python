@@ -11,7 +11,7 @@ import os
 import sys
 
 
-app = Sanic('l1-1')
+app = Sanic(__name__)
 print(sys.argv)
 
 
