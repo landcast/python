@@ -1,14 +1,18 @@
 #!/usr/bin/env python
 
+import base64
+
+from config import appconfig
 from sanic import Sanic
 from sanic import response
-from config import appconfig
-import os
+import functools
 import json
-import base64
+import os
+import sys
 
 
 app = Sanic('l1-1')
+print(sys.argv)
 
 
 def init(app):
@@ -39,12 +43,34 @@ def init(app):
     app.static('/favicon.ico', './static/favicon.ico', name='favicon.ico')
 
 
+def authorized():
+    def decorator(f):
+        @functools.wraps(f)
+        async def decorated_function(request, *args, **kwargs):
+            is_authorized = check_request_for_authorization_status(request)
+            if is_authorized:
+                result = await f(request, *args, **kwargs)
+                return result
+            else:
+                return response.json({'status': 'not_authorized'}, 403)
+        return decorated_function
+    return decorator
+
+
+def check_request_for_authorization_status(request):
+    if 'authorization' in request.headers:
+        return True
+    else:
+        return False
+
+
 @app.route("/")
 async def test(request):
     return response.json({"hello": "world"})
 
 
 @app.post("/json/echo")
+@authorized()
 async def json_echo(request):
     param_json = json.loads(request.body.decode())
     param_json['id'] = param_json['id'] + 1
