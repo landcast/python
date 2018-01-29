@@ -17,9 +17,6 @@ parser.add_argument(
 parser.add_argument('-p', '--db_pwd', help="password of mysql user usroilup")
 args = parser.parse_args()
 
-# for engine creation, refer http://docs.sqlalchemy.org/en/latest/core/engines.html
-print(args)
-
 db_pwd = 'YFZhshAd6vZ5zRLn'
 if args.db_pwd:
     db_pwd = args.db_pwd
@@ -54,42 +51,50 @@ def session_scope():
 def control():
     # ipdb.set_trace()
     with engine.connect() as con:
-        # 上架设备
-        rs = con.execute(
-            'SELECT g.goods_id from goods g where g.stock_state=0')
-        goods = [str(row[0]) for row in rs.fetchall()]
-        # print("goods id", goods)
-        # 发布帖子
-        rs = con.execute(
-            'SELECT t.topic_id from topic t where t.is_private=0 and t.topic_state=1')
-        topics = [str(row[0]) for row in rs.fetchall()]
-        # print("topics id", topics)
-        # 企业
-        rs = con.execute(
-            'SELECT org.organization_id  from organization org  where org.org_type = 8 and org.org_state= 3')
-        orgs = [str(row[0]) for row in rs.fetchall()]
-        # print("orgs id", orgs)
-        # 用户
-        rs = con.execute(
-            'SELECT um.user_main_id from user_main um where um.user_main_id not in(1,2)')
-        users = [str(row[0]) for row in rs.fetchall()]
-        # print("users id", users)
         # parse template
         ET.register_namespace(
             '', 'http://www.sitemaps.org/schemas/sitemap/0.9')
         tree = ET.parse('sitemap-template.xml')
         # add subelement
         root = tree.getroot()
+
+        # 上架设备
+        rs = con.execute(
+            'SELECT g.goods_id from goods g where g.stock_state=0')
+        goods = [str(row[0]) for row in rs.fetchall()]
+        # print("goods id", goods)
         process(goods, root,
                 'http://www.oilup.com/html/equimentdetails.html?id={0}')
+        print('finish goods url processing')
+        # 发布帖子
+        rs = con.execute(
+            'SELECT t.topic_id from topic t where t.is_private=0 and t.topic_state=1')
+        topics = [str(row[0]) for row in rs.fetchall()]
+        # print("topics id", topics)
         process(topics, root, 'http://www.oilup.com/html/details.html?id={0}')
+        print('finish topics url processing')
+        # 企业
+        rs = con.execute(
+            'SELECT org.organization_id  from organization org  where org.org_type = 8 and org.org_state= 3')
+        orgs = [str(row[0]) for row in rs.fetchall()]
+        # print("orgs id", orgs)
         process(
             orgs, root, 'http://www.oilup.com/html/companyOilup.html?id={0}&type=2')
+        print('finish companies url processing')
+        # 用户
+        rs = con.execute(
+            'SELECT um.user_main_id from user_main um where um.user_main_id not in(1,2)')
+        users = [str(row[0]) for row in rs.fetchall()]
+        # print("users id", users)
         process(users, root,
                 'http://www.oilup.com/html/myOilup.html?id={0}&type=1')
+        print('finish users url processing')
+        # format root
         indent(root)
+        # write to result xml
         tree.write('sitemap.xml', encoding='utf-8',
                    xml_declaration=True, method='xml')
+        print('finish writing sitemap.xml')
 
 
 def process(ids, root, url_prefix):
