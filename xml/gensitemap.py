@@ -4,6 +4,7 @@ import sqlalchemy
 import sqlalchemy.orm
 from sqlalchemy.ext.automap import automap_base
 from contextlib import contextmanager
+import datetime
 import sys
 import xml.etree.ElementTree as ET
 import ipdb
@@ -30,6 +31,8 @@ Base.prepare(engine, reflect=True)
 metadata = sqlalchemy.MetaData(engine)
 Session = sqlalchemy.orm.sessionmaker(bind=engine)
 session = Session()
+
+today = datetime.date.isoformat(datetime.datetime.now())
 
 
 @contextmanager
@@ -88,6 +91,7 @@ def control():
 
 
 def process(ids, root, url_prefix):
+    global today
     for id in ids:
         url_element = ET.SubElement(root, 'url')
         loc = ET.SubElement(url_element, 'loc')
@@ -95,7 +99,7 @@ def process(ids, root, url_prefix):
         priority = ET.SubElement(url_element, 'priority')
         priority.text = '0.8'
         lastmod = ET.SubElement(url_element, 'lastmod')
-        lastmod.text = ''
+        lastmod.text = today + 'T00:00:00+00:00'
         changefreq = ET.SubElement(url_element, 'changefreq')
         changefreq.text = 'daily'
 
