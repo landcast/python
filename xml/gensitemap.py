@@ -2,32 +2,34 @@
 
 import sqlalchemy
 import sqlalchemy.orm
-from sqlalchemy.ext.automap import automap_base
+
 from contextlib import contextmanager
+
+import argparse
 import datetime
-import sys
 import xml.etree.ElementTree as ET
 import ipdb
 
 
-# Create Automap Base object
-Base = automap_base()
+parser = argparse.ArgumentParser(description='Process some integers.')
+parser.add_argument(
+    '-i', '--db_ip', help="ip or host name of oilup mysql server")
+parser.add_argument('-p', '--db_pwd', help="password of mysql user usroilup")
+args = parser.parse_args()
+
 # for engine creation, refer http://docs.sqlalchemy.org/en/latest/core/engines.html
-print(sys.argv)
+print(args)
 
 db_pwd = 'YFZhshAd6vZ5zRLn'
-if len(sys.argv) > 1:
-    db_pwd = sys.argv[1]
+if args.db_pwd:
+    db_pwd = args.db_pwd
 
 db_ip = '172.18.18.111'
-if len(sys.argv) > 2:
-    db_ip = sys.argv[2]
+if args.db_ip:
+    db_ip = args.db_ip
 
 engine = sqlalchemy.create_engine('mysql://usroilup:' + db_pwd + '@' + db_ip + ':3306/oilup?charset=utf8mb4',
                                   echo=False, isolation_level='READ_COMMITTED')
-# Using reflect for automap
-Base.prepare(engine, reflect=True)
-
 metadata = sqlalchemy.MetaData(engine)
 Session = sqlalchemy.orm.sessionmaker(bind=engine)
 session = Session()
