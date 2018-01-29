@@ -3,15 +3,14 @@
 import sqlalchemy
 import sqlalchemy.orm
 
-from contextlib import contextmanager
-
 import argparse
 import datetime
 import xml.etree.ElementTree as ET
 import ipdb
 
 
-parser = argparse.ArgumentParser(description='Process some integers.')
+parser = argparse.ArgumentParser(
+    description='Generate sitemap.xml from mysql.')
 parser.add_argument(
     '-i', '--db_ip', help="ip or host name of oilup mysql server")
 parser.add_argument('-p', '--db_pwd', help="password of mysql user usroilup")
@@ -32,20 +31,6 @@ Session = sqlalchemy.orm.sessionmaker(bind=engine)
 session = Session()
 
 today = datetime.date.isoformat(datetime.datetime.now())
-
-
-@contextmanager
-def session_scope():
-    """Provide a transactional scope around a series of operations."""
-    session = Session()
-    try:
-        yield session
-        session.commit()
-    except (IOError, ValueError) as err:
-        session.rollback()
-        raise
-    finally:
-        pass
 
 
 def control():
