@@ -82,6 +82,7 @@ def control():
             orgs, root, 'http://www.oilup.com/html/companyOilup.html?id={0}&type=2')
         process(users, root,
                 'http://www.oilup.com/html/myOilup.html?id={0}&type=1')
+        indent(root)
         tree.write('sitemap.xml', encoding='utf-8',
                    xml_declaration=True, method='xml')
 
@@ -97,6 +98,23 @@ def process(ids, root, url_prefix):
         lastmod.text = ''
         changefreq = ET.SubElement(url_element, 'changefreq')
         changefreq.text = 'daily'
+
+
+def indent(elem, level=0):
+    i = "\n" + level * "  "
+    if len(elem):
+        if not elem.text or not elem.text.strip():
+            elem.text = i + "  "
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+        for elem in elem:
+            indent(elem, level + 1)
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+    else:
+        if level and (not elem.tail or not elem.tail.strip()):
+            elem.tail = i
+    return elem
 
 
 if __name__ == '__main__':
