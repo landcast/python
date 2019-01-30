@@ -184,6 +184,9 @@ def _get_static_binary_image(img_file, threshold=140):
                 pixdata[x, y] = 0
             else:
                 pixdata[x, y] = 255
+
+    filename = './out_img/' + img_file.split('.')[0] + '-binary.jpg'
+    img.save(filename)
     return img
 
 
@@ -315,8 +318,8 @@ if __name__ == "__main__":
     # im = _get_static_binary_image(image_file, threshold=50)
     # print('二值化识别50', image_to_string(im))
 
-    im = _get_static_binary_image(image_file, threshold=125)
-    print('二值化识别125', image_to_string(im))
+    # im = _get_static_binary_image(image_file, threshold=125)
+    # print('二值化识别125', image_to_string(im))
 
     im = _get_static_binary_image(image_file, threshold=135)
     print('二值化识别135', image_to_string(im))
@@ -328,50 +331,50 @@ if __name__ == "__main__":
     # print('二值化识别250', image_to_string(im))
 
     # 自适应阈值二值化
-    im = cv2.imread(image_file)
-    im = _get_dynamic_binary_image(im, ".", img_name)
-
-    # 对图片进行干扰线降噪
-    im = interference_line(im, img_name)
-
-    # 对图片进行点降噪
-    im = interference_point(im, img_name)
-    print('降噪识别', image_to_string(im))
-
-    # 切割的位置
-    im_position = CFS(im)
-
-    maxL = max(im_position[0])
-    minL = min(im_position[0])
-
-    # 如果有粘连字符，如果一个字符的长度过长就认为是粘连字符，并从中间进行切割
-    if maxL > minL + minL * 0.7:
-        maxL_index = im_position[0].index(maxL)
-        minL_index = im_position[0].index(minL)
-        # 设置字符的宽度
-        im_position[0][maxL_index] = maxL // 2
-        im_position[0].insert(maxL_index + 1, maxL // 2)
-        # 设置字符X轴[起始，终点]位置
-        im_position[1][maxL_index][1] = im_position[1][maxL_index][0] + maxL // 2
-        im_position[1].insert(maxL_index + 1, [im_position[1][maxL_index][1] + 1, im_position[1][maxL_index][1] + 1 + maxL // 2])
-        # 设置字符的Y轴[起始，终点]位置
-        im_position[2].insert(maxL_index + 1, im_position[2][maxL_index])
-
-    # 切割字符，要想切得好就得配置参数，通常 1 or 2 就可以
-    cutting_img(im, im_position, img_name,1,1)
-
-    # 识别验证码
-    cutting_img_num = 0
-    for file in os.listdir('./out_img'):
-        str_img = ''
-        if fnmatch(file, '%s-cutting-*.jpg' % img_name.split('.')[0]):
-            cutting_img_num += 1
-    for i in range(cutting_img_num):
-        try:
-            file = './out_img/%s-cutting-%s.jpg' % (img_name.split('.')[0], i)
-            # 识别验证码  单个字符是10，一行文本是7
-            str_img = str_img + image_to_string(Image.open(file), lang = 'eng', config='-psm 10')
-        except Exception as err:
-            pass
-    print('切图：%s' % cutting_img_num)
-    print('识别为：%s' % str_img)
+    # im = cv2.imread(image_file)
+    # im = _get_dynamic_binary_image(im, ".", img_name)
+    #
+    # # 对图片进行干扰线降噪
+    # im = interference_line(im, img_name)
+    #
+    # # 对图片进行点降噪
+    # im = interference_point(im, img_name)
+    # print('降噪识别', image_to_string(im))
+    #
+    # # 切割的位置
+    # im_position = CFS(im)
+    #
+    # maxL = max(im_position[0])
+    # minL = min(im_position[0])
+    #
+    # # 如果有粘连字符，如果一个字符的长度过长就认为是粘连字符，并从中间进行切割
+    # if maxL > minL + minL * 0.7:
+    #     maxL_index = im_position[0].index(maxL)
+    #     minL_index = im_position[0].index(minL)
+    #     # 设置字符的宽度
+    #     im_position[0][maxL_index] = maxL // 2
+    #     im_position[0].insert(maxL_index + 1, maxL // 2)
+    #     # 设置字符X轴[起始，终点]位置
+    #     im_position[1][maxL_index][1] = im_position[1][maxL_index][0] + maxL // 2
+    #     im_position[1].insert(maxL_index + 1, [im_position[1][maxL_index][1] + 1, im_position[1][maxL_index][1] + 1 + maxL // 2])
+    #     # 设置字符的Y轴[起始，终点]位置
+    #     im_position[2].insert(maxL_index + 1, im_position[2][maxL_index])
+    #
+    # # 切割字符，要想切得好就得配置参数，通常 1 or 2 就可以
+    # cutting_img(im, im_position, img_name,1,1)
+    #
+    # # 识别验证码
+    # cutting_img_num = 0
+    # for file in os.listdir('./out_img'):
+    #     str_img = ''
+    #     if fnmatch(file, '%s-cutting-*.jpg' % img_name.split('.')[0]):
+    #         cutting_img_num += 1
+    # for i in range(cutting_img_num):
+    #     try:
+    #         file = './out_img/%s-cutting-%s.jpg' % (img_name.split('.')[0], i)
+    #         # 识别验证码  单个字符是10，一行文本是7
+    #         str_img = str_img + image_to_string(Image.open(file), lang = 'eng', config='-psm 10')
+    #     except Exception as err:
+    #         pass
+    # print('切图：%s' % cutting_img_num)
+    # print('识别为：%s' % str_img)
